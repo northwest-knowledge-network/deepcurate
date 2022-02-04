@@ -1,3 +1,4 @@
 # deepcurate
 
-We webapp for curating crowdsourced images for use in training deep learning models.
+A simple webapp for curating crowdsourced images for use in training deep learning models.
+Our use case: Processing (cropping, classifying) images of Cereal Crop Pests in the Inland Northwest.
