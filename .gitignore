@@ -1,0 +1,13 @@
+__pycache__/*
+config.py
+nohup.out
+venv/*
+images/*
+static/images/*
+flask_session/*
+*.swp
+*.gz
+*.csv
+*.dat
+*.xlsx
+*.sqlite3

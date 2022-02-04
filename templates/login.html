@@ -1,0 +1,32 @@
+
+<html>
+  <head>
+    <title>Cereal Pest ID - Classify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Please Identify Yourself</h1>
+      <br>
+      <form action="" method="post">
+        <input type="radio" id="sanford" name="who" value="sanford">
+	<label for "sanford">Sanford Eigenbrode</label><br>
+        <input type="radio" id="marek" name="who" value="marek">
+	<label for "marek">Marek Borowiec</label><br>
+        <input type="radio" id="subodh" name="who" value="subodh">
+	<label for "subodh">Subodh Adhikari</label><br>
+        <input type="radio" id="arash" name="who" value="arash">
+	<label for "arash">Arash Rashed</label><br>
+        <input type="radio" id="luke" name="who" value="luke">
+	<label for "luke">Luke Sheneman</label><br>
+        <input type="radio" id="jennifer" name="who" value="jennifer">
+	<label for "jennifer">Jennifer Hinds</label><br>
+        <input class="btn btn-default" type="submit" value="Proceed">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+<!doctype html>
+
+<link href="static/css/cropper.min.css" rel="stylesheet" media="screen">
+
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/js/bootstrap.bundle.min.js" ></script>
+<!--<script type="text/javascript" src="static/js/jkpopimage.js"></script> -->
+
+<script type="text/javascript" src="static/js/cropper.min.js"></script>
+
+
+<title>{% block title %}{% endblock %} - Photos</title>
+
+{% include "header.html" %}
+
+
+
+<div class="container">  
+    <div>
+      <img id="cropperimage" src="static/images/imagebank/05719611-e735-4bdb-8bf8-79300adec5a3.jpg" alt="Picture">
+    </div>
+</div>
+
+
+
+  <script>
+
+    function foo(i) {
+       console.log("foo");
+       console.log(i);
+  
+       var fee = "static/images/imagebank/".concat(i);
+       
+       console.log(fee);
+  
+       //document.getElementById["cropperimage"].src;
+       document.querySelector('#cropperimage').src = fee;
+
+	console.log("before destroy")
+	console.log("  container width:  %d", crp.getContainerData().width)
+	console.log("  container height: %d", crp.getContainerData().height)
+
+        crp.destroy();
+        crp = cropperInit();
+
+	console.log("after init")
+	console.log("  container width:  %d", crp.getContainerData().width)
+	console.log("  container height: %d", crp.getContainerData().height)
+
+
+    }
+
+
+
+    function cropperInit() {
+
+      var image = document.querySelector('#cropperimage');
+      var minAspectRatio = 0.5;
+      console.log(image)
+      var maxAspectRatio = 1.5;
+      var cropper = new Cropper(image, {
+        ready: function () {
+          var cropper = this.cropper;
+          var containerData = cropper.getContainerData();
+          var cropBoxData = cropper.getCropBoxData();
+          // var aspectRatio = cropBoxData.width / cropBoxData.height;
+	  var aspectRatio = 0.75;
+          var newCropBoxWidth;
+
+	  console.log("In cropperInit()");
+	  console.log("  container width:  %d", cropper.getContainerData().width);
+	  console.log("  container height: %d", cropper.getContainerData().height);
+	  console.log("      aspect ratio: %f", aspectRatio);
+
+          if (aspectRatio < minAspectRatio || aspectRatio > maxAspectRatio) {
+            newCropBoxWidth = cropBoxData.height * ((minAspectRatio + maxAspectRatio) / 2);
+
+           cropper.setCropBoxData({
+             left: (containerData.width - newCropBoxWidth) / 2,
+             width: newCropBoxWidth
+
+          });
+
+        }
+      }
+
+        cropmove: function () {
+          var cropper = this.cropper;
+          var cropBoxData = cropper.getCropBoxData();
+          var aspectRatio = cropBoxData.width / cropBoxData.height;
+
+          if (aspectRatio < minAspectRatio) {
+            cropper.setCropBoxData({
+              width: cropBoxData.height * minAspectRatio
+            });
+          } else if (aspectRatio > maxAspectRatio) {
+            cropper.setCropBoxData({
+              width: cropBoxData.height * maxAspectRatio
+            });
+          }
+        },
+      });
+
+      return(cropper);
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+       crp = cropperInit();
+    });
+
+  </script>
+
+
+
+
+{{ pagination.info }}
+
+<table class="table table-striped">
+
+<tbody>
+<TR>
+
+   {% for item in data %}
+   <TD>
+	<IMG id="{{item[1]}}" SRC="static/images/thumbnails/{{item[1]}}" onClick="foo('{{item[1]}}')">
+   </TD>
+   {% endfor %}
+	
+</TR>
+</tbody>
+</table>
+
+{{pagination.info}}
+{{pagination.links}}
+

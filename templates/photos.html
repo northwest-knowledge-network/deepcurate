@@ -1,0 +1,132 @@
+<!doctype html>
+
+<link href="static/css/cropper.min.css" rel="stylesheet" media="screen"> 
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/js/bootstrap.bundle.min.js" ></script>
+<!--<script type="text/javascript" src="static/js/jkpopimage.js"></script> -->
+
+<script type="text/javascript" src="static/js/cropper.min.js"></script>
+
+<script>
+
+    function initCropper() {
+      var image = document.querySelector('#cropperimage');
+      var cropper = new Cropper(image, {
+        movable: true,
+        zoomable: true,
+        rotatable: false,
+        scalable: false,
+      });
+
+      cropper.replace("static/images/imagebank/".concat(metadata[0][1]));
+
+      return(cropper);
+    }
+
+
+    function cropClassify() {
+        console.log("cropClassify")
+        var cropform = document.getElementById("crop_classify");
+        cropform.style.visibility = 'visible';
+
+    }
+
+    function clickCropper(image_id, image_path, index) {
+
+        document.getElementById(image_id).style.border = "10px solid blue";
+
+        cropper.replace("static/images/imagebank/".concat(image_path));
+        current_metadata = metadata[index];
+
+        $('#image_id').text(current_metadata[0]);
+        $('#image_crop').text(current_metadata[2]);
+        $('#image_contributor').text(current_metadata[4]);
+        $('#image_coordinates').text("(" + current_metadata[5] + "," + current_metadata[6] + ")");
+        $('#image_timestamp').text(current_metadata[15]);
+        $('#image_width').text(current_metadata[7]);
+        $('#image_height').text(current_metadata[8]);
+        $('#image_camera').text(current_metadata[9]);
+        $('#image_lens').text(current_metadata[10]);
+
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+        metadata = {{data | tojson}};
+        cropper = initCropper();
+    });
+
+</script>
+
+
+
+
+
+<title>{% block title %}{% endblock %} - Photos</title> 
+{% include "header.html" %}
+
+<table align=center width=90%>
+<tr>
+<td align=left width=75%>
+
+  <div class="container">
+    <div>
+      <img height=600px id="cropperimage" src="" alt="Picture">
+    </div>
+  </div>
+
+</td>
+<td align=left>
+
+    <div id="metadata">
+
+	<center> <h3> Image Metadata </h3> </center>
+	Image ID: <div style="display:inline" id="image_id"></div> <br>
+	Crop: <div style="display:inline" class="text-uppercase" id="image_crop"></div> <br>
+	Contributor: <div style="display:inline" id="image_contributor"></div> <br>
+	Coordinates: <div style="display:inline" id="image_coordinates"></div> <br>
+	Timestamp: <div style="display:inline" id="image_timestamp"></div> <br>
+	Width: <div style="display:inline" id="image_width"></div> <br>
+	Height: <div style="display:inline" id="image_height"></div> <br>
+	Camera: <div style="display:inline" id="image_camera"></div> <br>
+	Lens: <div style="display:inline" id="image_lens"></div> <br>
+
+    </div>
+
+    <hr>
+
+    <button type="button" id="cropclassify" onClick="cropClassify()">Crop & Classify</button>
+
+    <hr>
+
+    <div id="crop_classify" style="visibility:hidden; display:inline;">
+	<h2> crop and classify foo here  </h2>
+    </div>
+   
+</td>
+</tr>
+</table>
+
+
+
+
+{{ pagination.info }}
+
+<table class="table table-striped">
+
+<tbody>
+<TR>
+
+   {% for item in data %}	
+   <TD>
+	<IMG id="{{item[0]}}" SRC="static/images/thumbnails/{{item[1]}}" onClick="clickCropper({{item[0]}}, '{{item[1]}}', {{loop.index-1}})">  
+   </TD>
+   {% endfor %}
+	
+</TR>
+</tbody>
+</table>
+
+{{pagination.info}}
+{{pagination.links}}
+
