@@ -10,16 +10,18 @@
 
 <script>
 
+    const metadata = {{data | tojson}};
+    let current_selection = 0;
+
+
     function initCropper() {
-      var image = document.querySelector('#cropperimage');
-      var cropper = new Cropper(image, {
+      const image = document.querySelector('#cropperimage');
+      const cropper = new Cropper(image, {
         movable: true,
         zoomable: true,
         rotatable: false,
         scalable: false,
       });
-
-      cropper.replace("static/images/imagebank/".concat(metadata[0][1]));
 
       return(cropper);
     }
@@ -27,17 +29,28 @@
 
     function cropClassify() {
         console.log("cropClassify")
-        var cropform = document.getElementById("crop_classify");
+        let cropform = document.getElementById("crop_classify");
+
         cropform.style.visibility = 'visible';
 
     }
 
-    function clickCropper(image_id, image_path, index) {
+    function deselectCropper(index) {
+        document.getElementById(metadata[index][0]).style.border = "10px solid red";
+    }
 
+
+    function clickCropper(index) {
+
+	const current_metadata = metadata[index];
+	const image_id = metadata[index][0];
+	const image_path = metadata[index][1];
+
+	deselectCropper(current_selection);
         document.getElementById(image_id).style.border = "10px solid blue";
+	current_selection = index;
 
         cropper.replace("static/images/imagebank/".concat(image_path));
-        current_metadata = metadata[index];
 
         $('#image_id').text(current_metadata[0]);
         $('#image_crop').text(current_metadata[2]);
@@ -52,8 +65,8 @@
     }
 
     window.addEventListener('DOMContentLoaded', function () {
-        metadata = {{data | tojson}};
         cropper = initCropper();
+	clickCropper(current_selection);
     });
 
 </script>
@@ -119,7 +132,7 @@
 
    {% for item in data %}	
    <TD>
-	<IMG id="{{item[0]}}" SRC="static/images/thumbnails/{{item[1]}}" onClick="clickCropper({{item[0]}}, '{{item[1]}}', {{loop.index-1}})">  
+	<IMG id="{{item[0]}}" SRC="static/images/thumbnails/{{item[1]}}" onClick="clickCropper({{loop.index-1}})">  
    </TD>
    {% endfor %}
 	
