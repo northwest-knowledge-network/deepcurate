@@ -1,0 +1,84 @@
+
+<table class="table">
+<tbody>
+<tr>
+<td>
+    <div class="col-md-9 docs-buttons">
+
+        {# move or crop #}
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" data-method="setDragMode" data-option="move" title="Move" onClick="cropper.setDragMode('move')">
+              <span class="fa fa-arrows-alt"></span>
+          </button>
+          <button type="button" class="btn btn-primary" data-method="setDragMode" data-option="crop" title="Crop" onClick="cropper.setDragMode('crop')">
+              <span class="fa fa-crop-alt"></span>
+          </button>
+        </div>
+
+</td>
+<td>
+
+        {# zoom in/out #}
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" data-method="zoom" data-option="0.1" title="Zoom In" onClick="cropper.zoom(0.1)">
+              <span class="fa fa-search-plus"></span>
+          </button>
+          <button type="button" class="btn btn-primary" data-method="zoom" data-option="-0.1" title="Zoom Out" onClick="cropper.zoom(-0.1)">
+              <span class="fa fa-search-minus"></span>
+          </button>
+        </div>
+</td>
+<td>
+        {# rotate 45 deg #}
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" data-method="rotate" data-option="-45" title="Rotate Left" onClick="cropper.rotate(-45)">
+              <span class="fa fa-undo-alt"></span>
+          </button>
+          <button type="button" class="btn btn-primary" data-method="rotate" data-option="45" title="Rotate Right" onClick="cropper.rotate(45)">
+              <span class="fa fa-redo-alt"></span>
+          </button>
+        </div>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+<table class="table">
+<tbody>
+<tr>
+<td>
+
+        {# move image #}
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" data-method="move" data-option="-10" data-second-option="0" title="Move Left" onClick="cropper.move(-10,0)">
+              <span class="fa fa-arrow-left"></span>
+          </button>
+          <button type="button" class="btn btn-primary" data-method="move" data-option="10" data-second-option="0" title="Move Right" onClick="cropper.move(10,0)">
+              <span class="fa fa-arrow-right"></span>
+          </button>
+          <button type="button" class="btn btn-primary" data-method="move" data-option="0" data-second-option="-10" title="Move Up" onClick="cropper.move(0,-10)">
+              <span class="fa fa-arrow-up"></span>
+          </button>
+          <button type="button" class="btn btn-primary" data-method="move" data-option="0" data-second-option="10" title="Move Down" onClick="cropper.move(0,10)">
+              <span class="fa fa-arrow-down"></span>
+          </button>
+        </div>
+</td>
+<td>
+
+        {# clear all crop rect #}
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" data-method="clear" title="Clear" onClick="cropper.clear()">
+              <span class="fa fa-times"></span>
+          </button>
+        </div>
+
+</td>
+</tr>
+</tbody>
+</table>
+
+  </div>
+
+</div
