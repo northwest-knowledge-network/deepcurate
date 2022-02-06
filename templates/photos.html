@@ -30,10 +30,14 @@
     function cropClassify() {
         console.log("cropClassify")
 
-	$("#classifyModal").modal("show");
+	const crop_image = cropper.getCroppedCanvas({ maxWidth: 4096, maxHeight: 4096 });
+	console.log(crop_image)
+	
+	myImage = crop_image.toDataURL("image/png");
+	imageElement = document.getElementById("modalImage");
+	imageElement.src = myImage;
 
-        let cropform = document.getElementById("crop_classify");
-        cropform.style.visibility = 'visible';
+	$("#classifyModal").modal("show");
 
     }
 
@@ -120,20 +124,6 @@
 
 {% include "toolbox.html" %}
 
-
-    <div id="crop_classify" style="visibility:hidden; display:inline;">
-
-	HERE
-
-{#
-	<form action="" method="post">
-	   {% for tax in taxonomy %}
-              <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
-              <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>	
-	   {% endfor %}
-	</form>
-#}
-    </div>
    
 </td>
 </tr>
