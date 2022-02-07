@@ -21,6 +21,9 @@
         zoomable: true,
         rotatable: true,
         scalable: true,
+	ready: function() {
+		$("#loadingModal").modal("hide");
+    	}
       });
 
       return(cropper);
@@ -33,11 +36,15 @@
 	const crop_image = cropper.getCroppedCanvas({ maxWidth: 4096, maxHeight: 4096 });
 	console.log(crop_image)
 	
-	myImage = crop_image.toDataURL("image/png");
+	croppedImageData = crop_image.toDataURL("image/png");
 	imageElement = document.getElementById("modalImage");
-	imageElement.src = myImage;
+	imageElement.src = croppedImageData;
 
 	$("#classifyModal").modal("show");
+
+	document.getElementById('modalSpinner').style.display = 'none';
+	
+	updateMetadataBox();
 
     }
 
@@ -45,18 +52,8 @@
         document.getElementById(metadata[index][0]).style.border = "10px solid red";
     }
 
-
-    function clickCropper(index) {
-
-	const current_metadata = metadata[index];
-	const image_id = metadata[index][0];
-	const image_path = metadata[index][1];
-
-	deselectCropper(current_selection);
-        document.getElementById(image_id).style.border = "10px solid blue";
-	current_selection = index;
-
-        cropper.replace("static/images/imagebank/".concat(image_path));
+    function updateMetadataBox() {
+	const current_metadata = metadata[current_selection];
 
         $('#image_id').text(current_metadata[0]);
         $('#image_crop').text(current_metadata[2]);
@@ -67,6 +64,60 @@
         $('#image_height').text(current_metadata[8]);
         $('#image_camera').text(current_metadata[9]);
         $('#image_lens').text(current_metadata[10]);
+
+        $('#modal_image_id').text(current_metadata[0]);
+        $('#modal_image_crop').text(current_metadata[2]);
+        $('#modal_image_contributor').text(current_metadata[4]);
+        $('#modal_image_coordinates').text("(" + current_metadata[5] + "," + current_metadata[6] + ")");
+        $('#modal_image_timestamp').text(current_metadata[15]);
+    }
+
+
+
+    function clickCropper(index) {
+
+	// const current_metadata = metadata[index];
+	const image_id = metadata[index][0];
+	const image_path = metadata[index][1];
+	
+	$("#loadingModal").modal("show");
+
+	deselectCropper(current_selection);
+        document.getElementById(image_id).style.border = "10px solid blue";
+	current_selection = index;
+
+        cropper.replace("static/images/imagebank/".concat(image_path));
+
+	updateMetadataBox();
+
+    }
+
+    function photoArchive() {
+	console.log("In photoArchive()"); 
+    }
+
+
+    function uploadCropped() {
+	console.log("In uploadCropped()");
+
+	document.getElementById('modalSpinner').style.display = 'inline';
+
+	const api_url = "/upload";
+	const data = {'croppedImage': croppedImageData, 'who':'{{who}}'}
+
+	console.log("uploading...")
+
+	fetch(api_url, {
+		method: "POST",
+		headers: {'Content-Type': 'application/json'}, 
+		body: JSON.stringify(data)
+	}).then(res => {
+		$("#classifyModal").modal("hide");
+		console.log("Request complete! response:", res);
+	});
+
+	console.log("done...")
+
 
     }
 
@@ -91,6 +142,7 @@
   <div class="container">
     <div>
       <img height=600px id="cropperimage" src="" alt="Picture">
+      <img id="photoSpinner" src="/static/img/loader.gif" style="display:none">
     </div>
   </div>
 
@@ -98,29 +150,31 @@
 </td>
 <td align=left>
 
-    <div id="metadata">
+   <div id="metadata_box">
 
-	<center> <h3> Image Metadata </h3> </center>
-	Image ID: <div style="display:inline" id="image_id"></div> <br>
-	Crop: <div style="display:inline" class="text-uppercase" id="image_crop"></div> <br>
-	Contributor: <div style="display:inline" id="image_contributor"></div> <br>
-	Coordinates: <div style="display:inline" id="image_coordinates"></div> <br>
-	Timestamp: <div style="display:inline" id="image_timestamp"></div> <br>
-	Width: <div style="display:inline" id="image_width"></div> <br>
-	Height: <div style="display:inline" id="image_height"></div> <br>
-	Camera: <div style="display:inline" id="image_camera"></div> <br>
-	Lens: <div style="display:inline" id="image_lens"></div> <br>
+        <center> <h3> Image Metadata </h3> </center>
+        Image ID: <div style="display:inline" id="image_id"></div> <br>
+        Crop: <div style="display:inline" class="text-uppercase" id="image_crop"></div> <br>
+        Contributor: <div style="display:inline" id="image_contributor"></div> <br>
+        Coordinates: <div style="display:inline" id="image_coordinates"></div> <br>
+        Timestamp: <div style="display:inline" id="image_timestamp"></div> <br>
+        Width: <div style="display:inline" id="image_width"></div> <br>
+        Height: <div style="display:inline" id="image_height"></div> <br>
+        Camera: <div style="display:inline" id="image_camera"></div> <br>
+        Lens: <div style="display:inline" id="image_lens"></div> <br>
 
-    </div>
+   </div>
 
     <hr>
 
     <button type="button" id="cropclassify" onClick="cropClassify()">Crop & Classify</button> 
+    <button type="button" id="photoArchive" onClick="photoArchive()">Archive Image</button> 
 
     <hr>
 
 
 {% include "classifyModal.html" %}
+{% include "loadingModal.html" %}
 
 {% include "toolbox.html" %}
 

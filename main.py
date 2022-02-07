@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, session, redirect
 from flask_session import Session
 from flask_paginate import Pagination, get_page_args
 from PIL import Image
+from io import BytesIO
+import base64
 import os
 import json
 import mysql.connector
@@ -95,6 +97,26 @@ def help():
 	else:
 		who = ""
 	return(render_template("help.html", who=who))
+
+
+
+@app.route('/upload', methods = ['GET', 'POST'])
+def upload():
+	print("In upload()");
+
+	if request.method == 'POST':
+		content = request.json
+
+		image_data = content['croppedImage']
+		image_who  = content['who']
+	
+		# strip the mime type info off the image string to get just the base64
+		image_data = image_data.split("base64,")[1];
+
+		im = Image.open(BytesIO(base64.b64decode(image_data)))
+		im.save("uploads/foo.png")
+
+		return 'file uploaded successfully'
 
 if __name__ == '__main__':
 	app.run(port=9999, debug=True)
