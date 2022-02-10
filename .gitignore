@@ -3,8 +3,10 @@ config.py
 nohup.out
 venv/*
 images/*
+node_modules/*
 static/images/*
 flask_session/*
+package-lock.json
 *.swp
 *.gz
 *.csv

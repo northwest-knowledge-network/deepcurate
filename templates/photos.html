@@ -6,9 +6,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/js/bootstrap.bundle.min.js" ></script>
 <!--<script type="text/javascript" src="static/js/jkpopimage.js"></script> -->
 
+
+<script type="text/javascript" src="static/js/lena2.js"></script> 
+
 <script type="text/javascript" src="static/js/cropper.min.js"></script>
 
+
 <script>
+
 
     const metadata = {{data | tojson}};
     let current_selection = 0;
@@ -22,12 +27,57 @@
         rotatable: true,
         scalable: true,
 	ready: function() {
-		$("#loadingModal").modal("hide");
+		setTimeout(() => {  $("#loadingModal").modal("hide"); }, 1000);
     	}
       });
 
       return(cropper);
     }
+
+
+    // supporting function for retrieving a data URL for an image
+    function getBase64Image(img) {
+
+        // Create an empty canvas element
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Copy the image contents to the canvas
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        var dataURL = canvas.toDataURL("image/png");
+
+        return(dataURL);
+    }
+
+
+    function imgToCanvas(img) {
+
+        // Create an empty canvas element
+        let canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Copy the image contents to the canvas
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+	return(canvas)
+    }
+
+
+    function filterSave() {
+	$("#koalaModal").modal("hide");
+
+	fee = document.getElementById("filtered-image-big");
+	dataurl = getBase64Image(fee);
+
+	cropper.replace(dataurl);
+    }
+
+
 
 
     function cropClassify() {
@@ -45,12 +95,14 @@
 	document.getElementById('modalSpinner').style.display = 'none';
 	
 	updateMetadataBox();
-
     }
+
 
     function deselectCropper(index) {
         document.getElementById(metadata[index][0]).style.border = "10px solid red";
     }
+
+
 
     function updateMetadataBox() {
 	const current_metadata = metadata[current_selection];
@@ -97,6 +149,30 @@
     }
 
 
+    function uploadFiltered() {
+	console.log("In uploadFiltered()");
+
+	// document.getElementById('modalSpinner').style.display = 'inline';
+
+	const api_url = "/upload";
+	const data = {'croppedImage': croppedImageData, 'who':'{{who}}'}
+
+	console.log("uploading...")
+
+	fetch(api_url, {
+		method: "POST",
+		headers: {'Content-Type': 'application/json'}, 
+		body: JSON.stringify(data)
+	}).then(res => {
+		$("#classifyModal").modal("hide");
+		console.log("Request complete! response:", res);
+	});
+
+	console.log("done...")
+    }
+
+
+
     function uploadCropped() {
 	console.log("In uploadCropped()");
 
@@ -118,13 +194,114 @@
 
 	console.log("done...")
 
-
     }
+  
+    function copyCanvas(sourceCanvas) {
+
+	var destinationCanvas = document.createElement('canvas');
+	destinationCanvas.width = sourceCanvas.width;
+	destinationCanvas.height = sourceCanvas.height;
+	
+	//grab the context from your destination canvas
+	const destCtx = destinationCanvas.getContext('2d');
+
+	//call its drawImage() function passing it the source canvas directly
+	destCtx.drawImage(sourceCanvas, 0, 0);
+
+	return(destinationCanvas);
+    }
+
+    
+    function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
+       const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+       return { width: srcWidth*ratio, height: srcHeight*ratio };
+    }
+
+
+    function filtersButton() {
+	const image_id = metadata[current_selection][0];
+	const image_path = metadata[current_selection][1];
+
+	canvas_in_cropper = cropper.clear().getCroppedCanvas();
+
+	lenaInit(canvas_in_cropper);
+	$("#koalaModal").modal("show");
+    }
+
 
     window.addEventListener('DOMContentLoaded', function () {
         cropper = initCropper();
 	clickCropper(current_selection);
     });
+
+    function lenaApplyFilters(originalImage,
+			      originalImageBig,
+			      filteredImageCanvas,
+			      filteredImageCanvasBig) {
+
+
+	LenaJS.printCanvas(filteredImageCanvas, LenaJS.getImage(originalImage));	
+
+        LenaJS.filterImage2(filteredImageCanvas, LenaJS['saturation'], parseFloat(saturation_index.value), originalImageBig);
+        LenaJS.filterImage2(filteredImageCanvasBig, LenaJS['saturation'], parseFloat(saturation_index.value), originalImageBig);
+
+        LenaJS.filterImage3(filteredImageCanvas, LenaJS['sepia'], parseFloat(sepia_index.value), filteredImageCanvas);
+	LenaJS.filterImage3(filteredImageCanvasBig, LenaJS['sepia'], parseFloat(sepia_index.value), filteredImageCanvas);
+    }
+
+
+    function lenaInit(cropperCanvas) {
+
+	console.log("Init lenaInit()");
+
+	var originalImage = document.getElementById("original-image");
+	var originalImageBig = document.getElementById("original-image-big");
+	var filteredImageCanvas = document.getElementById("filtered-image");
+	var filteredImageCanvasBig = document.getElementById("filtered-image-big");
+	
+	originalImage.src = cropperCanvas.toDataURL();
+	originalImageBig.src = cropperCanvas.toDataURL();
+
+	LenaJS.printCanvas(filteredImageCanvas, LenaJS.getImage(originalImage));	
+
+
+	// register some event callbacks
+        saturation_index = document.getElementById("saturation");
+        saturation_index.addEventListener("change", function(e) {
+	   console.log("Saturation"); 
+    	   document.getElementById("saturation_level").innerHTML = saturation_index.value;
+
+	   //LenaJS.filterImage2(filteredImageCanvas, LenaJS['saturation'], parseFloat(saturation_index.value), originalImageBig);
+	   //LenaJS.filterImage2(filteredImageCanvasBig, LenaJS['saturation'], parseFloat(saturation_index.value), originalImageBig);
+	   lenaApplyFilters(originalImage, originalImageBig, filteredImageCanvas, filteredImageCanvasBig)
+        });
+
+        sepia_index = document.getElementById("sepia");
+        sepia_index.addEventListener("change", function(e) {
+	   console.log("Sepia"); 
+    	   document.getElementById("sepia_level").innerHTML = sepia_index.value;
+
+	   //LenaJS.filterImage2(filteredImageCanvas, LenaJS['sepia'], parseFloat(sepia_index.value), originalImageBig);
+	   //LenaJS.filterImage2(filteredImageCanvasBig, LenaJS['sepia'], parseFloat(sepia_index.value), originalImageBig);
+	   lenaApplyFilters(originalImage, originalImageBig, filteredImageCanvas, filteredImageCanvasBig)
+
+        });
+
+
+{#
+	filterChanger.addEventListener("change", function(e) {
+	  const filter = filterChanger.value;
+		
+	  if(filter != "none"){
+	  
+		// Apply filter
+		LenaJS.filterImage(filteredImageCanvas, LenaJS[filter], originalImageBig);
+		LenaJS.filterImage(filteredImageCanvasBig, LenaJS[filter], originalImageBig);
+	  }
+	}, false);
+#}
+
+    }
 
 </script>
 
@@ -134,6 +311,7 @@
 
 <title>{% block title %}{% endblock %} - Photos</title> 
 {% include "header.html" %}
+
 
 <table align=center width=90%>
 <tr>
@@ -168,6 +346,7 @@
     <hr>
 
     <button type="button" id="cropclassify" onClick="cropClassify()">Crop & Classify</button> 
+    <button type="button" id="filtersButton" onClick="filtersButton()">Filters</button> 
     <button type="button" id="photoArchive" onClick="photoArchive()">Archive Image</button> 
 
     <hr>
@@ -177,6 +356,10 @@
 {% include "loadingModal.html" %}
 
 {% include "toolbox.html" %}
+
+{# {% include "imageFiltersModal.html" %} #}
+
+{% include "koalaModal.html" %} 
 
    
 </td>
@@ -202,4 +385,6 @@
 
 {{pagination.info}}
 {{pagination.links}}
+
+{# <script  src="/static/js/imageFilters.js"></script> #}
 

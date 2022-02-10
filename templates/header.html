@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <title>Bootstrap </title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"> 
+<!--  <link href='/static/css/koala.css' rel='stylesheet' type='text/css' /> -->
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
 
+
 </head>
+
+
 <body>    
 	<nav class="navbar navbar-expand-sm navbar-light bg-light">
 	  <div class="container-fluid ">
              <a class="navbar-brand" href="{{ url_for('main') }}" alt="Cereal Pest Aid" title="Cereal Pest Aid">
-                <img width=50 src="{{ url_for('static', filename='img/cerealpestaid.png') }}" />
+                <img width=50 id="headerLogo" src="{{ url_for('static', filename='img/cerealpestaid.png') }}" />
              </a>
 
         	<div class="collapse navbar-collapse" id="mainNavBar">
