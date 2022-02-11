@@ -1,15 +1,13 @@
 <!doctype html>
 
 <link href="static/css/cropper.min.css" rel="stylesheet" media="screen"> 
+
 <script src="https://unpkg.com/@popperjs/core@2"></script>
 <script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.1/js/bootstrap.bundle.min.js" ></script>
-<!--<script type="text/javascript" src="static/js/jkpopimage.js"></script> -->
-
-
-<script type="text/javascript" src="static/js/lena2.js"></script> 
-
 <script type="text/javascript" src="static/js/cropper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/silvia-odwyer/pixels.js@0.8.1/dist/Pixels.js"></script>
+
 
 
 <script>
@@ -17,6 +15,10 @@
 
     const metadata = {{data | tojson}};
     let current_selection = 0;
+
+
+    lastFilteredCanvas = document.createElement("canvas");
+    lastFilteredCanvasFlag = false;
 
 
     function initCropper() {
@@ -36,16 +38,16 @@
 
 
     // supporting function for retrieving a data URL for an image
-    function getBase64Image(img) {
+    function getBase64Image(img1) {
 
         // Create an empty canvas element
         var canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
+        canvas.width = img1.width;
+        canvas.height = img1.height;
 
         // Copy the image contents to the canvas
         var ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img1, 0, 0);
 
         var dataURL = canvas.toDataURL("image/png");
 
@@ -65,16 +67,6 @@
         ctx.drawImage(img, 0, 0);
 
 	return(canvas)
-    }
-
-
-    function filterSave() {
-	$("#koalaModal").modal("hide");
-
-	fee = document.getElementById("filtered-image-big");
-	dataurl = getBase64Image(fee);
-
-	cropper.replace(dataurl);
     }
 
 
@@ -136,7 +128,9 @@
 
 	deselectCropper(current_selection);
         document.getElementById(image_id).style.border = "10px solid blue";
+
 	current_selection = index;
+	lastFilteredCanvasFlag = false;
 
         cropper.replace("static/images/imagebank/".concat(image_path));
 
@@ -196,35 +190,110 @@
 
     }
   
-    function copyCanvas(sourceCanvas) {
-
-	var destinationCanvas = document.createElement('canvas');
-	destinationCanvas.width = sourceCanvas.width;
-	destinationCanvas.height = sourceCanvas.height;
-	
-	//grab the context from your destination canvas
-	const destCtx = destinationCanvas.getContext('2d');
-
-	//call its drawImage() function passing it the source canvas directly
-	destCtx.drawImage(sourceCanvas, 0, 0);
-
-	return(destinationCanvas);
-    }
-
     
     function calculateAspectRatioFit(srcWidth, srcHeight, maxWidth, maxHeight) {
        const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
        return { width: srcWidth*ratio, height: srcHeight*ratio };
     }
 
+     function getImage(img) {
 
-    function filtersButton() {
-	const image_id = metadata[current_selection][0];
-	const image_path = metadata[current_selection][1];
+	console.log("In getImage()");
+	console.log(img);
 
-	canvas_in_cropper = cropper.clear().getCroppedCanvas();
+       var c = document.createElement('canvas');
+          c.width = img.width;
+          c.height = img.height;
 
-	lenaInit(canvas_in_cropper);
+       var ctx = c.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+       return ctx.getImageData(0, 0, img.width, img.height);
+    }
+
+
+    function printCanvas(can, imgData) {
+
+       can.width  = imgData.width;
+       can.height = imgData.height;
+
+       var ctx = can.getContext('2d');
+       ctx.putImageData(imgData, 0, 0);
+    }
+
+
+    function copyCanvas(destCanvas, sourceCanvas) {
+
+	destCanvas.width = sourceCanvas.width;
+	destCanvas.height = sourceCanvas.height;
+	
+	//grab the context from your destination canvas
+	const sourceCtx = sourceCanvas.getContext('2d');
+	const destCtx = destCanvas.getContext('2d');
+
+        const sourceImageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+	destCtx.putImageData(sourceImageData, 0, 0);
+    }
+
+
+    function filterSave() {
+	
+	console.log("In filterSave()")	
+
+	let filteredCanvasBig = document.getElementById('filtered-canvas-big');
+	let filteredContextBig = filteredCanvasBig.getContext("2d");
+
+	let lastFilteredContext = lastFilteredCanvas.getContext("2d");
+	
+        let filteredImageDataBig = filteredContextBig.getImageData(0, 0, filteredCanvasBig.width, filteredCanvasBig.height);
+	lastFilteredCanvas.width = filteredImageDataBig.width;
+	lastFilteredCanvas.height = filteredImageDataBig.height;
+
+	lastFilteredContext.putImageData(filteredImageDataBig, 0, 0);
+	lastFilteredCanvasFlag = true;
+	
+	cropper.destroy();
+        document.querySelector('#cropperimage').src = filteredCanvasBig.toDataURL();
+	cropper = initCropper();	
+
+	$("#koalaModal").modal("hide");
+    }
+    
+     function doFilter(filter) {
+	const filteredCanvas = document.getElementById('filtered-canvas');
+	const filteredCanvasBig = document.getElementById('filtered-canvas-big');
+	
+	ctx = filteredCanvas.getContext("2d");
+	ctxBig = filteredCanvasBig.getContext("2d");
+
+	imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	filteredImageData = pixelsJS.filterImgData(imageData, filter);
+	ctx.putImageData(filteredImageData, 0, 0);
+
+	imageData = ctxBig.getImageData(0, 0, canvas.width, canvas.height);
+	filteredImageData = pixelsJS.filterImgData(imageData, filter);
+	ctxBig.putImageData(filteredImageData, 0, 0);
+    }
+
+
+    function filterButton() {
+
+	console.log("In filterButton()")
+
+	if(lastFilteredCanvasFlag == false) {
+	   console.log("  FALSE");
+	   canvas = cropper.clear().getCroppedCanvas();
+	} else {
+	   console.log("  TRUE");
+	   canvas = lastFilteredCanvas;
+	}
+
+	const filteredCanvas = document.getElementById('filtered-canvas');
+	const filteredCanvasBig = document.getElementById('filtered-canvas-big');
+	
+	copyCanvas(filteredCanvas, canvas);
+	copyCanvas(filteredCanvasBig, canvas);
+
 	$("#koalaModal").modal("show");
     }
 
@@ -232,76 +301,11 @@
     window.addEventListener('DOMContentLoaded', function () {
         cropper = initCropper();
 	clickCropper(current_selection);
+	
+	console.log(pixelsJS.getFilterList());
+
     });
 
-    function lenaApplyFilters(originalImage,
-			      originalImageBig,
-			      filteredImageCanvas,
-			      filteredImageCanvasBig) {
-
-
-	LenaJS.printCanvas(filteredImageCanvas, LenaJS.getImage(originalImage));	
-
-        LenaJS.filterImage2(filteredImageCanvas, LenaJS['saturation'], parseFloat(saturation_index.value), originalImageBig);
-        LenaJS.filterImage2(filteredImageCanvasBig, LenaJS['saturation'], parseFloat(saturation_index.value), originalImageBig);
-
-        LenaJS.filterImage3(filteredImageCanvas, LenaJS['sepia'], parseFloat(sepia_index.value), filteredImageCanvas);
-	LenaJS.filterImage3(filteredImageCanvasBig, LenaJS['sepia'], parseFloat(sepia_index.value), filteredImageCanvas);
-    }
-
-
-    function lenaInit(cropperCanvas) {
-
-	console.log("Init lenaInit()");
-
-	var originalImage = document.getElementById("original-image");
-	var originalImageBig = document.getElementById("original-image-big");
-	var filteredImageCanvas = document.getElementById("filtered-image");
-	var filteredImageCanvasBig = document.getElementById("filtered-image-big");
-	
-	originalImage.src = cropperCanvas.toDataURL();
-	originalImageBig.src = cropperCanvas.toDataURL();
-
-	LenaJS.printCanvas(filteredImageCanvas, LenaJS.getImage(originalImage));	
-
-
-	// register some event callbacks
-        saturation_index = document.getElementById("saturation");
-        saturation_index.addEventListener("change", function(e) {
-	   console.log("Saturation"); 
-    	   document.getElementById("saturation_level").innerHTML = saturation_index.value;
-
-	   //LenaJS.filterImage2(filteredImageCanvas, LenaJS['saturation'], parseFloat(saturation_index.value), originalImageBig);
-	   //LenaJS.filterImage2(filteredImageCanvasBig, LenaJS['saturation'], parseFloat(saturation_index.value), originalImageBig);
-	   lenaApplyFilters(originalImage, originalImageBig, filteredImageCanvas, filteredImageCanvasBig)
-        });
-
-        sepia_index = document.getElementById("sepia");
-        sepia_index.addEventListener("change", function(e) {
-	   console.log("Sepia"); 
-    	   document.getElementById("sepia_level").innerHTML = sepia_index.value;
-
-	   //LenaJS.filterImage2(filteredImageCanvas, LenaJS['sepia'], parseFloat(sepia_index.value), originalImageBig);
-	   //LenaJS.filterImage2(filteredImageCanvasBig, LenaJS['sepia'], parseFloat(sepia_index.value), originalImageBig);
-	   lenaApplyFilters(originalImage, originalImageBig, filteredImageCanvas, filteredImageCanvasBig)
-
-        });
-
-
-{#
-	filterChanger.addEventListener("change", function(e) {
-	  const filter = filterChanger.value;
-		
-	  if(filter != "none"){
-	  
-		// Apply filter
-		LenaJS.filterImage(filteredImageCanvas, LenaJS[filter], originalImageBig);
-		LenaJS.filterImage(filteredImageCanvasBig, LenaJS[filter], originalImageBig);
-	  }
-	}, false);
-#}
-
-    }
 
 </script>
 
@@ -346,7 +350,7 @@
     <hr>
 
     <button type="button" id="cropclassify" onClick="cropClassify()">Crop & Classify</button> 
-    <button type="button" id="filtersButton" onClick="filtersButton()">Filters</button> 
+    <button type="button" id="filterButton" onClick="filterButton()">Filters</button> 
     <button type="button" id="photoArchive" onClick="photoArchive()">Archive Image</button> 
 
     <hr>
