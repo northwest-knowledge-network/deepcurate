@@ -20,7 +20,7 @@ dbconn = database_open(config.MYSQL_DATABASE_HOST,
 cursor = dbconn.cursor()
 
 # Read the whole photos table
-sql = "SELECT id, filename, crop, crop_other, contributor_name, lat, lng, width, height, camera_model, lens_desc, class1, class2, class3, class4, timestamp FROM photos"
+sql = "SELECT id, filename, crop, crop_other, contributor_name, lat, lng, width, height, camera_model, lens_desc, timestamp, archived FROM photos"
 val = ()
 cursor.execute(sql,val)
 data = cursor.fetchall()

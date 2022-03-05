@@ -13,40 +13,45 @@
 
 <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"> -->
 <!-- <link rel="stylesheet" href="/static/css/foostyle.css"> -->
-<table>
+<table style="border:1px solid black; width:100%">
 <tr>
 <td>
 
 <div class="container">
 
-        <button type="button" class="btn btn-secondary" onClick="doFilter('incbrightness');">Brighter</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('darkify');">Darker</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('greyscale');">Grayscale</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('warmth');">Warmth</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('sat_adj');">Saturation</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('invert');">Invert</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('min_noise');">Noise</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('specks');">Specks</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('coral');">Coral</button> <br>
-        <button type="button" class="btn btn-secondary" onClick="doFilter('phase');">Phase</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('incbrightness');">Brighter</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('darkify');">Darker</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('greyscale');">Grayscale</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('warmth');">Warmth</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('sat_adj');">Saturation</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('invert');">Invert</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('min_noise');">Noise</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('specks');">Specks</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('coral');">Coral</button> <br>
+        <button type="button" class="btn btn-secondary button-fun" onClick="doFilter('phase');">Phase</button> <br>
+	<p>&nbsp;<br>
+        <button type="button" class="btn btn-outline-danger button-fun" onClick="resetFilter();">Reset</button> <br>
 </div>
 
-<button id="resetAll">reset</button>
 </td>
 <td>
 
 <canvas id="filtered-canvas" style="max-width:600px; max-height:600px; border:10px solid black;"></canvas> 
-
 <canvas id="filtered-canvas-big" style="display:none;"></canvas>
 
-{#
-<canvas id="original-canvas" style="max-width:600px; max-height:600px; display:none;"></canvas>
-<canvas id="original-canvas-big" style="display:none;"></canvas>
-#}
+</td>
+<td style="border:2px solid black;">
+<div class="filterDiv">
 
-<img id="hidden_image" style="display:none;">
+<center>brightness</center> <br>
+<input class="slider" type="range" id="brightness-slider" min=".4" max="1" step=".01" value="1" style="inline;"> <p> 
 
+<center>saturation</center> <br>
+<input class="slider" type="range" id="saturation-slider" min=".4" max="1" step=".01" value="1" style="inline;"> <p> 
+<center>contrast</center><br>
+<input class="slider" type="range" id="contrast-slider" min=".4" max="1" step=".01" value="1" style="inline;"> <p> 
 
+</div>
 </td>
 </tr>
 </table>

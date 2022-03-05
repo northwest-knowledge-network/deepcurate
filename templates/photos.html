@@ -17,8 +17,10 @@
     let current_selection = 0;
 
 
-    lastFilteredCanvas = document.createElement("canvas");
-    lastFilteredCanvasFlag = false;
+    var lastFilteredCanvas = document.createElement("canvas");
+    var prefilterCanvas = document.createElement("canvas");
+    var lastFilteredCanvasFlag = false;
+
 
 
     function initCropper() {
@@ -132,7 +134,7 @@
 	current_selection = index;
 	lastFilteredCanvasFlag = false;
 
-        cropper.replace("static/images/imagebank/".concat(image_path));
+        cropper.replace("static/images/photos/imagebank/".concat(image_path));
 
 	updateMetadataBox();
 
@@ -224,6 +226,10 @@
 
     function copyCanvas(destCanvas, sourceCanvas) {
 
+	console.log("In copyCanvas()");	
+	console.log(destCanvas);
+	console.log(sourceCanvas);
+
 	destCanvas.width = sourceCanvas.width;
 	destCanvas.height = sourceCanvas.height;
 	
@@ -233,6 +239,29 @@
 
         const sourceImageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
 	destCtx.putImageData(sourceImageData, 0, 0);
+    }
+
+
+	
+    function storePrefilterCanvas(sourceCanvas) {
+
+	prefilterCanvas.width = sourceCanvas.width;
+	prefilterCanvas.height = sourceCanvas.height;
+	
+	//grab the context from your destination canvas
+	const sourceCtx = sourceCanvas.getContext('2d');
+	const destCtx = prefilterCanvas.getContext('2d');
+
+        const sourceImageData = sourceCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height);
+	destCtx.putImageData(sourceImageData, 0, 0);
+	
+    }
+
+
+    function resetFilter() {
+
+	copyCanvas(document.getElementById('filtered-canvas'), prefilterCanvas);
+	copyCanvas(document.getElementById('filtered-canvas-big'), prefilterCanvas);
     }
 
 
@@ -293,6 +322,8 @@
 	
 	copyCanvas(filteredCanvas, canvas);
 	copyCanvas(filteredCanvasBig, canvas);
+	
+	storePrefilterCanvas(canvas);
 
 	$("#koalaModal").modal("show");
     }
@@ -301,6 +332,10 @@
     window.addEventListener('DOMContentLoaded', function () {
         cropper = initCropper();
 	clickCropper(current_selection);
+
+    document.getElementById('opacity-slider').addEventListener('input', function (e) {
+  	document.body.style.opacity = this.value;
+    });
 	
 	console.log(pixelsJS.getFilterList());
 
@@ -311,10 +346,14 @@
 
 
 
-
-
 <title>{% block title %}{% endblock %} - Photos</title> 
 {% include "header.html" %}
+
+<!-- LOAD UP OUR MODALS -->
+{% include "classifyModal.html" %}
+{% include "loadingModal.html" %}
+{% include "toolbox.html" %}
+{% include "koalaModal.html" %} 
 
 
 <table align=center width=90%>
@@ -356,14 +395,6 @@
     <hr>
 
 
-{% include "classifyModal.html" %}
-{% include "loadingModal.html" %}
-
-{% include "toolbox.html" %}
-
-{# {% include "imageFiltersModal.html" %} #}
-
-{% include "koalaModal.html" %} 
 
    
 </td>
@@ -379,7 +410,7 @@
 
    {% for item in data %}	
    <TD>
-	<IMG id="{{item[0]}}" SRC="static/images/thumbnails/{{item[1]}}" onClick="clickCropper({{loop.index-1}})">  
+	<IMG id="{{item[0]}}" SRC="static/images/photos/thumbnails/{{item[1]}}" onClick="clickCropper({{loop.index-1}})">  
    </TD>
    {% endfor %}
 	

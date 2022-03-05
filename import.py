@@ -11,24 +11,24 @@ import config
 from database import database_open, database_query, database_close 
 
 
-# IMAGES_ROOT is the root directory containing all images and thumbnails
-IMAGES_ROOT = "./images"
+# PHOTOS_ROOT is the root directory containing all images and thumbnails
+PHOTOS_ROOT = "./images/photos"
 
 # for now, IMPORT_BATCH points to the src directory to import images from
-IMPORT_BATCH = os.path.join(IMAGES_ROOT, 'batch_001_01.14.2022')
+IMPORT_BATCH = os.path.join(PHOTOS_ROOT, 'batch_001_01.14.2022')
 
 # THUMBNAILS is the directory containing normalized, resized thumbnails
-THUMBNAILS = os.path.join(IMAGES_ROOT, 'thumbnails')
+THUMBNAILS = os.path.join(PHOTOS_ROOT, 'thumbnails')
 
 # IMAGEBANK is the directory containing all full-size imported images
-IMAGEBANK = os.path.join(IMAGES_ROOT, 'imagebank')
+IMAGEBANK = os.path.join(PHOTOS_ROOT, 'imagebank')
 
 # PREVIEWDIR is the directory containing larger previews of images for popups
-PREVIEWDIR = os.path.join(IMAGES_ROOT, 'previews')
+PREVIEWDIR = os.path.join(PHOTOS_ROOT, 'previews')
 
 
 print("PATHS:")
-print("   IMAGES_ROOT: %s" %IMAGES_ROOT)
+print("   PHOTOS_ROOT: %s" %PHOTOS_ROOT)
 print("   IMPORT_BATCH: %s" %IMPORT_BATCH)
 print("   THUMBNAILS: %s" %THUMBNAILS)
 print("   IMAGEBANK: %s" %IMAGEBANK)
@@ -177,7 +177,7 @@ def deposit_image(fullpath, newfilename, imagebank, thumbnail, previews):
 	img = Image.open(fullpath)
 
 	imgbankpath = os.path.join(imagebank, newfilename)
-	img.save(imgbankpath, format="JPEG", quality=80, optimize=True, progressive=True)	
+	img.save(imgbankpath, format="JPEG", quality=100, optimize=True, progressive=True)	
 
 	thumb_img = img.copy()
 	thumb_img.thumbnail(THUMBNAIL_SIZE)
@@ -187,7 +187,7 @@ def deposit_image(fullpath, newfilename, imagebank, thumbnail, previews):
 	prev_img = img.copy()
 	prev_img.thumbnail(PREVIEW_SIZE)
 	prevpath   = os.path.join(previews, newfilename)
-	prev_img.save(prevpath, format="JPEG", quality=80, optimize=True, progressive=True)
+	prev_img.save(prevpath, format="JPEG", quality=75, optimize=True, progressive=True)
 
 
 

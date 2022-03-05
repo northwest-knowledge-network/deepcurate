@@ -9,92 +9,98 @@
            </div>
            <div class="modal-body">
 
-
-	   <table class="table table-bordered" cellspacing="1">  
-
-
-	   <thead class="thead-dark">
-	    <tr>
-	      <th scope="col">Image</th>
-	      <th scope="col">Aphids</th>
-	      <th scope="col">Beetles</th>
-	      <th scope="col">Weevils</th>
-	      <th scope="col">Other</th>
-	    </tr>
-	   </thead>
-	   <tbody>
+           <table class="table table-bordered" cellspacing="1">
+           <thead class="thead table-dark">
+            <tr>
+              <th scope="col">Cropped Image</th>
+              <th scope="col">Image Metadata</th>
+            </tr>
+           </thead>
+           <tbody>
            <tr>
+           <td align=left style="vertical-align: center;">
+           <center><IMG style="max-width:300px; max-height:300px;" id="modalImage"></center>
+           </td>
 
-           <td style="vertical-align: center;">
-	   <center><IMG style="max-width:200px; max-height:200px;" id="modalImage"></center>
+           <td align=left style="vertical-align: center;">
+           <div id="metadata_box">
+                Image ID: <div style="display:inline" id="modal_image_id"></div> <br>
+                Crop: <div style="display:inline" class="text-uppercase" id="modal_image_crop"></div> <br>
+                Contributor: <div style="display:inline" id="modal_image_contributor"></div> <br>
+                Coordinates: <div style="display:inline" id="modal_image_coordinates"></div> <br>
+                Timestamp: <div style="display:inline" id="modal_image_timestamp"></div> <br>
+           </div>
 
-   	   <div id="metadata_box">
-
-	      <small>
-		Image ID: <div style="display:inline" id="modal_image_id"></div> <br>
-		Crop: <div style="display:inline" class="text-uppercase" id="modal_image_crop"></div> <br>
-		Contributor: <div style="display:inline" id="modal_image_contributor"></div> <br>
-		Coordinates: <div style="display:inline" id="modal_image_coordinates"></div> <br>
-		Timestamp: <div style="display:inline" id="modal_image_timestamp"></div> <br>
-	      </small>
-
- 	   </div>
-
-	   </td>
-
-           <td style="vertical-align: top;">
-           {% for tax in taxonomy %}
-		{% if tax[3] is equalto 1 %}
-              	   <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
-                   <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>
-		{% endif %}
-           {% endfor %}
-	   </td>
-
-
-           <td style="vertical-align: top;">
-           {% for tax in taxonomy %}
-		{% if tax[3] is equalto 2 %}
-              	   <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
-                   <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>
-		{% endif %}
-           {% endfor %}
-	   </td>
-
-
-           <td style="vertical-align: top;">
-           {% for tax in taxonomy %}
-		{% if tax[3] is equalto 3 %}
-              	   <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
-                   <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>
-		{% endif %}
-           {% endfor %}
-	   </td>
-
-
-           <td style="vertical-align: top;">
-           {% for tax in taxonomy %}
-		{% if tax[3] is equalto 4 %}
-              	   <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
-                   <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>
-		{% endif %}
-           {% endfor %}
-	   </td>
-
-	   </tr>	
-	   </tbody>
+           </td>
+           </tr>
            </table>
 
-	  <div class="form-group purple-border">
-  	    <label for="exampleFormControlTextarea4">Notes:</label>
-  	    <textarea class="form-control" id="classificationNotes" rows="2"></textarea>
-	  </div> 
+           <table class="table table-bordered" cellspacing="1">
+           <thead class="thead table-dark">
+            <tr>
+              <th scope="col">Aphids</th>
+              <th scope="col">Beetles</th>
+              <th scope="col">Weevils</th>
+              <th scope="col">Other</th>
+            </tr>
+           </thead>
+           <tbody>
+           <tr>
+
+
+           <td align=left style="vertical-align: top;">
+           {% for tax in taxonomy %}
+                {% if tax[3] is equalto 1 %}
+                   <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
+                   <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>
+                {% endif %}
+           {% endfor %}
+           </td>
+
+
+           <td align=left style="vertical-align: top;">
+           {% for tax in taxonomy %}
+                {% if tax[3] is equalto 2 %}
+                   <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
+                   <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>
+                {% endif %}
+           {% endfor %}
+           </td>
+
+
+           <td align=left style="vertical-align: top;">
+           {% for tax in taxonomy %}
+                {% if tax[3] is equalto 3 %}
+                   <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
+                   <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>
+                {% endif %}
+           {% endfor %}
+           </td>
+
+
+           <td align=left style="vertical-align: top;">
+           {% for tax in taxonomy %}
+                {% if tax[3] is equalto 4 %}
+                   <input type="radio" id="radio_{{tax[0]}}" name="classification" value="{{tax[0]}}">
+                   <label for "radio_{{tax[0]}}">{{tax[2]}}</label><br>
+                {% endif %}
+           {% endfor %}
+           </td>
+
+           </tr>
+           </tbody>
+           </table>
+
+          <div align=left class="form-group purple-border">
+            <label align=left for="exampleFormControlTextarea4"><h5>Notes:</h5></label>
+            <textarea class="form-control" id="classificationNotes" rows="2"></textarea>
+          </div>
 
            </div>
             <div class="modal-footer">
-		<div id="modalSpinner" style="display:inline">
-		  Saving...  <img src="static/img/loader.gif" style="display:inline; max-height:64px;">
-		</div>
+                <div id="modalSpinner" style="display:inline">
+                  Saving...  <img src="static/img/loader.gif" style="display:inline; max-height:64px;">
+                </div>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" onClick="uploadCropped()">Save changes</button>
             </div>
@@ -143,3 +149,4 @@
 +----+---------------------------------+-------------------------+---------------+
 
 #}
+
