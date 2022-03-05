@@ -6,6 +6,7 @@ images/*
 node_modules/*
 static/images/*
 flask_session/*
+uploads/*
 package-lock.json
 *.swp
 *.gz
