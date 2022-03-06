@@ -173,9 +173,20 @@
 	console.log("In uploadCropped()");
 
 	document.getElementById('modalSpinner').style.display = 'inline';
+	notes = document.getElementById('classificationNotes').value;
+
+	const current_metadata = metadata[current_selection];
+        const photo_id = current_metadata[0];
+
+	taxonomy = $('input[name="classification"]:checked').val();
+
+	
+	console.log(notes)
+	console.log(photo_id)
+	console.log(taxonomy)
 
 	const api_url = "/upload";
-	const data = {'croppedImage': croppedImageData, 'who':'{{who}}'}
+	const data = {'croppedImage': croppedImageData, 'who':'{{who}}', 'notes': notes, 'photo_id': photo_id, 'taxonomy':taxonomy}
 
 	console.log("uploading...")
 
@@ -352,7 +363,6 @@
 <!-- LOAD UP OUR MODALS -->
 {% include "classifyModal.html" %}
 {% include "loadingModal.html" %}
-{% include "toolbox.html" %}
 {% include "koalaModal.html" %} 
 
 
@@ -394,6 +404,7 @@
 
     <hr>
 
+{% include "toolbox.html" %}
 
 
    

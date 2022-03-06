@@ -3,13 +3,14 @@ import mysql.connector
 
 import config
 
-
-def database_open(db_host, db_database, db_username, db_password):
+def database_open():
 	try:
-		#print(db_host, db_database, db_username, db_password)
-		connection = mysql.connector.connect(host=db_host, database=db_database, username=db_username, password=db_password)
-		print("CONNECTED TO DB!")
+		connection = mysql.connector.connect(host=config.MYSQL_DATABASE_HOST, 
+						     database=config.MYSQL_DATABASE_DB, 
+						     username=config.MYSQL_DATABASE_USER, 
+						     password=config.MYSQL_DATABASE_PASSWORD)
 		return(connection)
+
 	except mysql.connector.Error as error:
 		print("FAILED TO CONNECT TO DB: " + error)
 		exit(-1)
@@ -17,10 +18,6 @@ def database_open(db_host, db_database, db_username, db_password):
 
 
 def database_query(conn, sql, val):
-
-	#print(sql)
-	#print(val)
-
 
 	try:
 		cursor = conn.cursor()

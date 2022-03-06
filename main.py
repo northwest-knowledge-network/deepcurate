@@ -3,7 +3,7 @@ from flask_session import Session
 from flask_paginate import Pagination, get_page_args
 from PIL import Image
 from io import BytesIO
-import base64
+import base64, uuid
 import os
 import json
 import mysql.connector
@@ -12,11 +12,7 @@ from database import database_open, database_query, database_close
 import config
 
 
-dbconn = database_open(config.MYSQL_DATABASE_HOST,
-                       config.MYSQL_DATABASE_DB,
-                       config.MYSQL_DATABASE_USER,
-                       config.MYSQL_DATABASE_PASSWORD)
-
+dbconn = database_open()
 cursor = dbconn.cursor()
 
 # Read the whole photos table
@@ -108,13 +104,52 @@ def upload():
 		content = request.json
 
 		image_data = content['croppedImage']
-		image_who  = content['who']
-	
+
 		# strip the mime type info off the image string to get just the base64
 		image_data = image_data.split("base64,")[1];
+		img = Image.open(BytesIO(base64.b64decode(image_data))).convert('RGB')
 
-		im = Image.open(BytesIO(base64.b64decode(image_data)))
-		im.save("uploads/foo.png")
+		img_photo_id = content['photo_id']
+		img_curator_id  = content['who']
+		img_notes = content['notes']
+		img_taxonomy_id = content['taxonomy']
+		(img_width, img_height) = img.size
+
+		print(img_photo_id)
+		print(img_curator_id)
+		print(img_taxonomy_id)
+		print(img_notes)
+		print(img_width, img_height)
+	
+
+		newfilenamebase = str(uuid.uuid4())
+		newfilename = newfilenamebase + ".jpg"
+
+		#+-------------+--------------+------+-----+---------+----------------+
+		#| Field       | Type         | Null | Key | Default | Extra          |
+		#+-------------+--------------+------+-----+---------+----------------+
+		#| id          | int(11)      | NO   | PRI | NULL    | auto_increment |
+		#| photos_id   | int(11)      | YES  |     | NULL    |                |
+		#| curators_id | int(11)      | YES  |     | NULL    |                |
+		#| taxonomy_id | int(11)      | YES  |     | NULL    |                |
+		#| width       | int(11)      | YES  |     | NULL    |                |
+		#| height      | int(11)      | YES  |     | NULL    |                |
+		#| path        | varchar(256) | YES  |     | NULL    |                |
+		#| notes       | text         | YES  |     | NULL    |                |
+		#+-------------+--------------+------+-----+---------+----------------+
+		
+		dbconn = database_open()
+		sql = "INSERT INTO processed (photos_id, curators_id, taxonomy_id, width, height, path, notes) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+		val = (img_photo_id, img_curator_id, img_taxonomy_id, img_width, img_height, newfilename, img_notes)
+		result = database_query(dbconn, sql, val)
+		dbconn.commit()
+		database_close(dbconn)
+
+		img.save(os.path.join(config.CROPPED_ROOT, "imagebank", newfilename), quality=100)
+
+		img.thumbnail(config.THUMBNAIL_SIZE)
+		thumbpath  = os.path.join(config.CROPPED_ROOT, "thumbnails", newfilename)
+		img.save(thumbpath, format="JPEG", quality=50, optimize=True, progressive=True)
 
 		return 'file uploaded successfully'
 
